@@ -1,9 +1,5 @@
 import React from "react";
 import { API_URL } from "../Variables";
-import axios from "axios";
-
-
-
 
 class LoginModal extends React.Component {
     constructor(props) {
@@ -28,24 +24,25 @@ class LoginModal extends React.Component {
         this.setState({ [event.target.name]: event.target.value });
     }
 
-    handleSubmit = (event) => {
+    handleSubmit = async (event) => {
         event.preventDefault();
-        axios.post(`${API_URL}/login`, {
-            username: this.state.username,
-            password: this.state.password,
-        })
-            .then((response) => {
-                this.setState({ loginSuccess: response.data });
-                if (response.data) {
-                    alert('Login successful');
-                } else {
-                    alert('Incorrect username or password');
-                }
-            })
-            .catch((error) => {
-                console.log(error);
-                alert('An error occurred while logging in');
-            });
+        const response = await fetch(`${API_URL}/Login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                username: this.state.username,
+                password: this.state.password,
+            }),
+        });
+        const data = await response.json();
+        this.setState({ loginSuccess: data });
+        if (data) {
+            alert('Login successful');
+        } else {
+            alert('Incorrect username or password');
+        }
     }
 
     render() {
@@ -74,6 +71,5 @@ class LoginModal extends React.Component {
         );
     }
 }
-
 
 export default LoginModal;

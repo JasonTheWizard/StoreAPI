@@ -13,16 +13,31 @@ class EditProduct extends Component {
             Description: this.props.product.Description,
             Price: this.props.product.Price,
             ProductCategoryId: this.props.product.ProductCategoryId,
-            modalOpen: false
+            modalOpen: false,
+            productCategories: [],
+            UpdateProduct: this.props.UpdateProduct
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
+
     handleChange(event) {
         this.setState({ [event.target.name]: event.target.value });
     }
 
+    UpdateProduct = (product) => {
+        const updatedProducts = this.state.products.map(p => {
+            if (p.ID === product.ID) {
+                return product;
+            }
+            return p;
+        });
+        this.setState({ products: updatedProducts });
+    }
+
+
+    
     handleSubmit(event) {
         event.preventDefault();
         const formData = new FormData();
@@ -38,8 +53,10 @@ class EditProduct extends Component {
             .then((res) => {
                 console.log(res);
                 this.setState({ modalOpen: false });
+                this.props.UpdateProduct(res.data);
             })
             .catch((err) => console.log(err));
+        
     }
 
     openModal = () => {
@@ -51,7 +68,15 @@ class EditProduct extends Component {
     }
 
 
+
+
+
+
+
+    
     render() {
+        const { productCategories } = this.props;
+
         return (
             <div>
                 <button onClick={this.openModal}>Edit</button>
@@ -68,7 +93,12 @@ class EditProduct extends Component {
                         <label>Price:</label>
                         <input type="number" name="Price" value={this.state.Price} onChange={this.handleChange} />
                         <label>ProductCategoryId:</label>
-                        <input type="number" name="ProductCategoryId" value={this.state.ProductCategoryId} onChange={this.handleChange} />
+                        <select value={this.state.ProductCategoryId || ''} onChange={this.handleChange} name="ProductCategoryId" required>
+                            <option value="">Select a Category</option>
+                            {productCategories ? productCategories.map(c => (
+                                <option key={c.ID} value={c.ID}>{c.Name}</option>
+                            )) : null}
+                        </select>
                         <input type="submit" value="Submit" />
                         <button onClick={this.closeModal}>Close</button>
                     </form>
@@ -77,6 +107,8 @@ class EditProduct extends Component {
         );
     }
 
+
+    
 }
 
 export default EditProduct;

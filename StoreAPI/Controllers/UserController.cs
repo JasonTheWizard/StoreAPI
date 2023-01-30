@@ -4,6 +4,9 @@ using StoreAPI.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using StoreAPI;
+using System;
+using System.Text;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -16,6 +19,7 @@ public class UserController : ControllerBase
         _context = context;
     }
 
+    
     // GET: api/User
     [HttpGet]
     public async Task<ActionResult<IEnumerable<User>>> GetUsers()
@@ -23,7 +27,8 @@ public class UserController : ControllerBase
         return await _context.Users.ToListAsync();
     }
 
-    // GET: api/Users/5
+    
+    // GET: api/User/5
     [HttpGet("{id}")]
     public async Task<ActionResult<User>> GetUser(int id)
     {
@@ -37,17 +42,36 @@ public class UserController : ControllerBase
         return user;
     }
 
-    // POST: api/Users
+
+    // POST: api/User
     [HttpPost]
-    public async Task<ActionResult<User>> PostUser(User user)
+    public IActionResult PostUser(User user)
     {
+        if (string.IsNullOrEmpty(user.Name))
+        {
+            return BadRequest("User name is required.");
+        }
+
+        if (_context.Users.Any(u => u.Name == user.Name))
+        {
+            return BadRequest("User name already exists.");
+        }
+
+        var password = Encoding.UTF8.GetBytes(user.Password);
+        var hashResult = HashUtility.GenerateHash(password);
+        user.PasswordHash = hashResult.PasswordHash;
+        user.PasswordSalt = hashResult.PasswordSalt;
+
         _context.Users.Add(user);
-        await _context.SaveChangesAsync();
+        _context.SaveChanges();
 
         return CreatedAtAction("GetUser", new { id = user.ID }, user);
     }
 
-    // PUT: api/Users/5
+
+
+
+    // PUT: api/User/5
     [HttpPut("{id}")]
     public async Task<IActionResult> PutUser(int id, User user)
     {
@@ -76,8 +100,9 @@ public class UserController : ControllerBase
 
         return NoContent();
     }
+    
 
-    // DELETE: api/Users/5
+    // DELETE: api/User/5
     [HttpDelete("{id}")]
     public async Task<ActionResult<User>> DeleteUser(int id)
     {

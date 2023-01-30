@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import AppNavbar from './AppNavbar';
 import LoginModal from './Modals/Login';
 import Product from './Product';
+import NewProduct from './Modals/NewProduct';
+import NewProductCategory from './Modals/NewProductCategory';
+import NewUser from './Modals/NewUser';
 
 
 class App extends Component {
@@ -14,12 +17,21 @@ class App extends Component {
 
                 <LoginModal />
 
+                <NewUser />
 
-               
+                <NewProduct />
 
-                <Product />
+                <NewProductCategory />
+
+
+                
+                <div>
+                    <Product />
+                </div>
+                
 
             </div>
+            
         );
     }
 }
